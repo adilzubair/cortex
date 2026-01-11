@@ -1,17 +1,25 @@
 from ingestion.loaders.filesystem import load_folder
 from ingestion.loaders.github import load_github_repo
+from ingestion.chunking import chunk_document
+from indexing.indexer import Indexer
 
-def ingest(source: str, source_type: str):
+def ingest_and_index(source: str, source_type: str):
     if source_type == "folder":
-        return load_folder(source)
+        docs = load_folder(source)
+    elif source_type == "github":
+        docs = load_github_repo(source)
+    else:
+        raise ValueError("Unsupported source type")
 
-    if source_type == "github":
-        return load_github_repo(source)
+    all_chunks = []
+    for doc in docs:
+        all_chunks.extend(chunk_document(doc))
 
-    raise ValueError("Unsupported source type")
+    indexer = Indexer()
+    indexer.index_chunks(all_chunks)
+
+    return len(all_chunks)
 
 
-
-docs = ingest("/Users/muhamedadil/gitea/chatbot", "folder")
-print(len(docs))
-print(docs[0].metadata)
+num_chunks = ingest_and_index("https://github.com/adilzubair/scripts", "github")
+print(f"Successfully ingested and indexed {num_chunks} chunks.")

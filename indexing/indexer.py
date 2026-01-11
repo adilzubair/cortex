@@ -1,0 +1,19 @@
+from embeddings.ollama import OllamaEmbeddingModel
+from vectorstore.chroma import VectorStoreManager
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Indexer:
+    def __init__(self, embedding_model=None, vector_store=None):
+        self.embedding_model = embedding_model or OllamaEmbeddingModel(
+            model="qwen3-embedding:0.6b",
+            base_url= "http://localhost:11434" 
+        )
+        self.vector_store = vector_store or VectorStoreManager()
+
+    def index_chunks(self, chunks):
+        texts = [chunk.content for chunk in chunks]
+        embeddings = self.embedding_model.embed(texts)
+        self.vector_store.add_chunks(chunks, embeddings)

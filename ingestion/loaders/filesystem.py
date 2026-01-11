@@ -18,8 +18,15 @@ TEXT_EXTENSIONS = {
 def load_folder(path: str) -> list[IngestedDocument]:
     documents = []
 
-    for root, _, files in os.walk(path):
+    for root, dirs, files in os.walk(path):
+        # Skip hidden directories in-place (dirs starting with .)
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        
         for file in files:
+            # Skip hidden files
+            if file.startswith('.'):
+                continue
+                
             ext = os.path.splitext(file)[1]
             full_path = os.path.join(root, file)
 
@@ -39,7 +46,7 @@ def load_folder(path: str) -> list[IngestedDocument]:
                             "source": "filesystem",
                             "path": os.path.relpath(full_path, path),
                             "type": doc_type,
-                            "language": CODE_EXTENSIONS.get(ext),
+                            "language": CODE_EXTENSIONS.get(ext, "unknown"),
                             "last_modified": datetime.fromtimestamp(
                                 os.path.getmtime(full_path)
                             ).isoformat()

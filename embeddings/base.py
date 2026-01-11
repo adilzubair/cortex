@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import List
 
-class BaseEmbedding(ABC):
+class EmbeddingModel(ABC):
     @abstractmethod
-    def embed(self, texts: list[str]) -> list[list[float]]:
+    def embed(self, texts: List[str]) -> List[List[float]]:
         pass
