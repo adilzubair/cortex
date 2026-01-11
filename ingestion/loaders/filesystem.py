@@ -1,0 +1,52 @@
+import os
+from .base import IngestedDocument
+from datetime import datetime
+
+CODE_EXTENSIONS = {
+    ".py": "python",
+    ".js": "javascript",
+    ".ts": "typescript",
+    ".java": "java",
+    ".cpp": "cpp",
+}
+
+TEXT_EXTENSIONS = {
+    ".md": "markdown",
+    ".txt": "text"
+}
+
+def load_folder(path: str) -> list[IngestedDocument]:
+    documents = []
+
+    for root, _, files in os.walk(path):
+        for file in files:
+            ext = os.path.splitext(file)[1]
+            full_path = os.path.join(root, file)
+
+            if ext not in CODE_EXTENSIONS and ext not in TEXT_EXTENSIONS:
+                continue
+
+            try:
+                with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+
+                doc_type = "code" if ext in CODE_EXTENSIONS else "text"
+
+                documents.append(
+                    IngestedDocument(
+                        content=content,
+                        metadata={
+                            "source": "filesystem",
+                            "path": os.path.relpath(full_path, path),
+                            "type": doc_type,
+                            "language": CODE_EXTENSIONS.get(ext),
+                            "last_modified": datetime.fromtimestamp(
+                                os.path.getmtime(full_path)
+                            ).isoformat()
+                        }
+                    )
+                )
+            except Exception as e:
+                print(f"Skipped {full_path}: {e}")
+
+    return documents
