@@ -45,6 +45,7 @@ def load_folder(path: str) -> list[IngestedDocument]:
                         metadata={
                             "source": "filesystem",
                             "path": os.path.relpath(full_path, path),
+                            "abs_path": os.path.abspath(full_path), # Add this line
                             "type": doc_type,
                             "language": CODE_EXTENSIONS.get(ext, "unknown"),
                             "last_modified": datetime.fromtimestamp(

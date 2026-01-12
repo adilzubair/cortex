@@ -14,6 +14,12 @@ class Indexer:
         self.vector_store = vector_store or VectorStoreManager()
 
     def index_chunks(self, chunks):
+        if not chunks:
+            return
         texts = [chunk.content for chunk in chunks]
         embeddings = self.embedding_model.embed(texts)
         self.vector_store.add_chunks(chunks, embeddings)
+
+    def delete_file_index(self, file_path: str):
+        """Removes all chunks for a given file from the vector store."""
+        self.vector_store.delete_by_file(file_path)

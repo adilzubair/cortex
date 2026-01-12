@@ -7,7 +7,18 @@ requires-python = ">=3.13"
 dependencies = [
     "chromadb>=1.4.0",
     "dotenv>=0.9.9",
+    "gitpython>=3.1.46",
+    "langchain>=1.2.3",
+    "langchain-chroma>=1.1.0",
+    "langchain-community>=0.4.1",
+    "langchain-ollama>=1.0.1",
+    "langchain-openai>=1.1.7",
     "pdfplumber>=0.11.9",
     "python-docx>=1.2.0",
+    "pyyaml>=6.0.3",
     "requests>=2.32.5",
+    "rich>=14.2.0",
+    "typer>=0.21.1",
+    "jedi>=0.19.2",
+    "watchdog>=4.0.0",
 ]
