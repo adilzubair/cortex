@@ -1,7 +1,7 @@
 from langchain.tools import tool
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
-from app.config import get_vector_persist_dir
+from core.config import get_vector_persist_dir
 import os
 import jedi
 

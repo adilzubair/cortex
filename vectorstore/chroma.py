@@ -2,7 +2,7 @@ import chromadb
 from chromadb.config import Settings
 from uuid import uuid4
 
-from app.config import get_vector_persist_dir
+from core.config import get_vector_persist_dir
 
 class VectorStoreManager:
     def __init__(self, project_path: str = ".", collection_name="cortex", persist_dir=None):

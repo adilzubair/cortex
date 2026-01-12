@@ -3,7 +3,7 @@ import hashlib
 import os
 from datetime import datetime
 
-from app.config import get_state_db_path
+from core.config import get_state_db_path
 
 class StateManager:
     def __init__(self, project_path: str = ".", db_path: str = None):
