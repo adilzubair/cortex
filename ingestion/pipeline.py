@@ -8,15 +8,15 @@ from ingestion.chunking import chunk_document
 def index_file(abs_path: str, source_root: str, indexer: Indexer = None, state_manager: StateManager = None):
     """Indexes a single file if it has changed."""
     if indexer is None:
-        indexer = Indexer()
+        indexer = Indexer(project_path=source_root)
     if state_manager is None:
-        state_manager = StateManager()
+        state_manager = StateManager(project_path=source_root)
 
     # Determine relative path for metadata
     rel_path = os.path.relpath(abs_path, source_root)
     
-    # Check if we should ignore (e.g. .git, __pycache__, .venv, chroma storage)
-    ignore_list = [".git", "__pycache__", ".venv", ".pytest_cache", "chroma", "indexing", ".gemini"]
+    # Check if we should ignore (e.g. .git, __pycache__, .venv, .cortex)
+    ignore_list = [".git", "__pycache__", ".venv", ".pytest_cache", ".cortex", ".gemini"]
     if any(part.startswith(".") or part in ignore_list for part in rel_path.split(os.sep)):
         return False
 
@@ -73,8 +73,8 @@ def ingest_and_index(source: str, source_type: str):
     else:
         raise ValueError("Unsupported source type")
 
-    indexer = Indexer()
-    state_manager = StateManager()
+    indexer = Indexer(project_path=source_abs)
+    state_manager = StateManager(project_path=source_abs)
     
     indexed_count = 0
     skipped_count = 0

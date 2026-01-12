@@ -1,13 +1,15 @@
 from langchain.agents import create_agent
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.messages import HumanMessage
-from agents.tools import tools
+from agents.tools import ProjectTools
 from llm.factory import LLMFactory
 
 class Orchestrator:
-    def __init__(self, provider: str = "ollama", model_name: str = None):
+    def __init__(self, project_path: str = ".", provider: str = "ollama", model_name: str = None):
         self.llm = LLMFactory.get_llm(provider, model_name)
         self.memory = InMemorySaver()
+        self.project_tools = ProjectTools(project_path)
+        self.tools = self.project_tools.get_tools()
         
         self.system_prompt = """
         You are Cortex, a professional and proactive AI software engineering assistant.
@@ -24,14 +26,11 @@ class Orchestrator:
         - Technical Queries: Skip the "I'd like to help, should I search?" fluff. Just search.
         """
         
-        # In this version of LangChain, create_agent handles the loop
-        # We add more explicit instructions for local models like Qwen
         self.agent = create_agent(
             model=self.llm,
-            tools=tools,
+            tools=self.tools,
             system_prompt=self.system_prompt,
-            checkpointer=self.memory,
-            debug= True
+            checkpointer=self.memory
         )
 
     def ask(self, query: str, thread_id: str = "default"):

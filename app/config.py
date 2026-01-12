@@ -1,9 +1,16 @@
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+def get_project_metadata_dir(project_path: str) -> str:
+    """Returns the absolute path to the .cortex directory within the project."""
+    return os.path.abspath(os.path.join(project_path, ".cortex"))
 
-class Settings:
-    LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
-    EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "ollama")
-    VECTOR_DB_DIR = os.getenv("VECTOR_DB_DIR", "./data/chroma")
+def get_state_db_path(project_path: str) -> str:
+    """Returns the path to the SQLite state database for the project."""
+    metadata_dir = get_project_metadata_dir(project_path)
+    os.makedirs(os.path.join(metadata_dir, "indexing"), exist_ok=True)
+    return os.path.join(metadata_dir, "indexing", "state.db")
+
+def get_vector_persist_dir(project_path: str) -> str:
+    """Returns the path to the ChromaDB directory for the project."""
+    metadata_dir = get_project_metadata_dir(project_path)
+    return os.path.join(metadata_dir, "chroma")

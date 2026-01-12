@@ -6,12 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Indexer:
-    def __init__(self, embedding_model=None, vector_store=None):
+    def __init__(self, project_path: str = ".", embedding_model=None, vector_store=None):
         self.embedding_model = embedding_model or OllamaEmbeddingModel(
             model="qwen3-embedding:0.6b",
             base_url= "http://localhost:11434" 
         )
-        self.vector_store = vector_store or VectorStoreManager()
+        self.vector_store = vector_store or VectorStoreManager(project_path=project_path)
 
     def index_chunks(self, chunks):
         if not chunks:

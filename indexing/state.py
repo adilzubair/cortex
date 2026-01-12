@@ -3,9 +3,14 @@ import hashlib
 import os
 from datetime import datetime
 
+from app.config import get_state_db_path
+
 class StateManager:
-    def __init__(self, db_path="indexing/state.db"):
-        self.db_path = db_path
+    def __init__(self, project_path: str = ".", db_path: str = None):
+        if db_path is None:
+            self.db_path = get_state_db_path(project_path)
+        else:
+            self.db_path = db_path
         self._init_db()
 
     def _init_db(self):

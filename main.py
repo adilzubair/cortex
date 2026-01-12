@@ -22,10 +22,11 @@ def index(
     """
     Index a codebase for retrieval.
     """
-    console.print(Panel(f"[bold blue]Indexing Source:[/bold blue] {path} ({source_type})", title="Cortex Ingestion"))
+    project_path = os.path.abspath(path)
+    console.print(Panel(f"[bold blue]Indexing Source:[/bold blue] {project_path} ({source_type})", title="Cortex Ingestion"))
     
     with console.status("[bold green]Working on indexing...[/bold green]"):
-        num_indexed = ingest_and_index(path, source_type)
+        num_indexed = ingest_and_index(project_path, source_type)
     
     console.print(f"\n[bold green]Success![/bold green] Indexed {num_indexed} files.")
 
@@ -36,26 +37,29 @@ def watch(
     """
     Automatically re-index files as they change.
     """
-    console.print(Panel(f"[bold blue]Watching Path:[/bold blue] {path}", title="Cortex Watcher"))
+    project_path = os.path.abspath(path)
+    console.print(Panel(f"[bold blue]Watching Path:[/bold blue] {project_path}", title="Cortex Watcher"))
     try:
-        start_watching(path)
+        start_watching(project_path)
     except KeyboardInterrupt:
         console.print("\n[bold red]Stopping watcher...[/bold red]")
 
 @app.command()
 def ask(
     query: str = typer.Argument(..., help="The question you want to ask about your codebase"),
-    provider: str = typer.Option("ollama", "--provider", "-p", help="LLM Provider: 'ollama' or 'openai'"),
+    project: str = typer.Option(".", "--project", "-p", help="Path to the project to query"),
+    provider: str = typer.Option("ollama", "--provider", help="LLM Provider: 'ollama' or 'openai'"),
     model: str = typer.Option(None, "--model", "-m", help="Specific model name")
 ):
     """
     Ask a single question about the indexed codebase.
     """
-    watcher = start_background_watcher(".")
+    project_path = os.path.abspath(project)
+    watcher = start_background_watcher(project_path)
     try:
-        console.print(Panel(f"[bold blue]Query:[/bold blue] {query}", title="Cortex Search"))
+        console.print(Panel(f"[bold blue]Project:[/bold blue] {project_path}\n[bold blue]Query:[/bold blue] {query}", title="Cortex Search"))
         
-        orchestrator = Orchestrator(provider=provider, model_name=model)
+        orchestrator = Orchestrator(project_path=project_path, provider=provider, model_name=model)
         
         with console.status("[bold yellow]Agent is thinking and searching...[/bold yellow]"):
             response = orchestrator.ask(query)
@@ -68,17 +72,19 @@ def ask(
 
 @app.command()
 def chat(
-    provider: str = typer.Option("ollama", "--provider", "-p", help="LLM Provider: 'ollama' or 'openai'"),
+    project: str = typer.Option(".", "--project", "-p", help="Path to the project to chat with"),
+    provider: str = typer.Option("ollama", "--provider", help="LLM Provider: 'ollama' or 'openai'"),
     model: str = typer.Option(None, "--model", "-m", help="Specific model name")
 ):
     """
     Start an interactive chat session with your codebase.
     """
-    watcher = start_background_watcher(".")
+    project_path = os.path.abspath(project)
+    watcher = start_background_watcher(project_path)
     try:
-        console.print(Panel("[bold magenta]Welcome to Cortex Chat![/bold magenta]\nType 'exit' or 'quit' to end the session.", title="Cortex Interactive"))
+        console.print(Panel(f"[bold magenta]Welcome to Cortex Chat![/bold magenta]\n[bold blue]Project:[/bold blue] {project_path}\nType 'exit' or 'quit' to end the session.", title="Cortex Interactive"))
         
-        orchestrator = Orchestrator(provider=provider, model_name=model)
+        orchestrator = Orchestrator(project_path=project_path, provider=provider, model_name=model)
         thread_id = "session_" + os.urandom(4).hex()
         
         while True:
