@@ -16,19 +16,30 @@ console = Console()
 
 @app.command()
 def index(
-    path: str = typer.Argument(".", help="Path to the folder or git repo to index"),
+    path: str = typer.Argument(".", help="Path to folder or GitHub URL (e.g., https://github.com/user/repo.git)"),
     source_type: str = typer.Option("folder", "--type", "-t", help="Type of source: 'folder' or 'github'")
 ):
     """
     Index a codebase for retrieval.
+    
+    For GitHub repos, use: cortex index https://github.com/user/repo.git --type github
     """
-    project_path = os.path.abspath(path)
-    console.print(Panel(f"[bold blue]Indexing Source:[/bold blue] {project_path} ({source_type})", title="Cortex Ingestion"))
+    is_github_url = source_type == "github" or path.startswith(("http://", "https://", "git@"))
+    
+    if is_github_url:
+        console.print(Panel(f"[bold blue]Indexing GitHub Repository:[/bold blue] {path}", title="Cortex Ingestion"))
+    else:
+        project_path = os.path.abspath(path)
+        console.print(Panel(f"[bold blue]Indexing Source:[/bold blue] {project_path} ({source_type})", title="Cortex Ingestion"))
     
     with console.status("[bold green]Working on indexing...[/bold green]"):
-        num_indexed = ingest_and_index(project_path, source_type)
+        num_indexed, actual_project_path = ingest_and_index(path, source_type)
     
     console.print(f"\n[bold green]Success![/bold green] Indexed {num_indexed} files.")
+    
+    if is_github_url:
+        console.print(f"\n[bold cyan]Repository cloned to:[/bold cyan] {actual_project_path}")
+        console.print(f"[bold cyan]To chat with this repo, use:[/bold cyan] cortex chat --project {actual_project_path}")
 
 @app.command()
 def watch(

@@ -1,7 +1,7 @@
 [project]
 name = "cortex"
 version = "0.1.0"
-description = "Add your description here"
+description = "Cortex: Your Local AI-Powered Codebase Assistant"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -21,4 +21,26 @@ dependencies = [
     "typer>=0.21.1",
     "jedi>=0.19.2",
     "watchdog>=4.0.0",
+]
+
+[project.scripts]
+cortex = "main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.wheel]
+include = [
+  "main.py",
+  "agents",
+  "core",
+  "embeddings",
+  "indexing",
+  "ingestion",
+  "llm",
+  "vectorstore",
 ]
