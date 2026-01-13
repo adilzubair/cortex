@@ -11,8 +11,9 @@ def get_embeddings():
     return OllamaEmbeddings(model="qwen3-embedding:0.6b", base_url="http://localhost:11434")
 
 class ProjectTools:
-    def __init__(self, project_path: str = "."):
+    def __init__(self, project_path: str = ".", llm=None):
         self.project_path = os.path.abspath(project_path)
+        self.llm = llm
         self.vectorstore = Chroma(
             collection_name="cortex",
             embedding_function=get_embeddings(),
@@ -22,7 +23,17 @@ class ProjectTools:
     def get_tools(self):
         @tool("search_code", description="Search for relevant code snippets in the indexed codebase. Useful for answering questions about how things work or finding specific logic.")
         def search_code(query: str):
-            results = self.vectorstore.similarity_search(query, k=5)
+            # Fetch more results initially for reranking
+            results = self.vectorstore.similarity_search(query, k=10)
+            
+            # Rerank results if LLM is available
+            if self.llm and results:
+                from agents.reranker import Reranker
+                reranker = Reranker(self.llm)
+                results = reranker.rerank(query, results, top_k=5)
+            else:
+                # Fallback to top 5 if no LLM
+                results = results[:5]
             formatted = []
             for doc in results:
                 formatted.append(f"File: {doc.metadata.get('path')}\nContent:\n{doc.page_content}\n---")
