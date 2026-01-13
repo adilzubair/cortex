@@ -65,23 +65,36 @@ def index_file(abs_path: str, source_root: str, indexer: Indexer = None, state_m
     return False
 
 def ingest_and_index(source: str, source_type: str):
-    source_abs = os.path.abspath(source)
-    if source_type == "folder":
-        docs = load_folder(source_abs)
-    elif source_type == "github":
-        docs = load_github_repo(source_abs)
+    """
+    Ingest and index a codebase from a folder or GitHub repository.
+    
+    Args:
+        source: Path to folder or GitHub URL
+        source_type: Either 'folder' or 'github'
+    
+    Returns:
+        tuple: (number of indexed files, project path)
+    """
+    # Determine if source is a GitHub URL
+    is_github_url = source_type == "github" or source.startswith(("http://", "https://", "git@"))
+    
+    if is_github_url:
+        # For GitHub repos, clone and get the persistent path
+        docs, project_path = load_github_repo(source)
     else:
-        raise ValueError("Unsupported source type")
+        # For local folders, use the absolute path
+        project_path = os.path.abspath(source)
+        docs = load_folder(project_path)
 
-    indexer = Indexer(project_path=source_abs)
-    state_manager = StateManager(project_path=source_abs)
+    indexer = Indexer(project_path=project_path)
+    state_manager = StateManager(project_path=project_path)
     
     indexed_count = 0
     skipped_count = 0
 
     for doc in docs:
         abs_path = doc.metadata.get("abs_path")
-        if index_file(abs_path, source_abs, indexer, state_manager):
+        if index_file(abs_path, project_path, indexer, state_manager):
             indexed_count += 1
         else:
             skipped_count += 1
@@ -89,7 +102,7 @@ def ingest_and_index(source: str, source_type: str):
     print(f"\n--- Indexing Summary ---")
     print(f"Files Indexed: {indexed_count}")
     print(f"Files Skipped: {skipped_count}")
-    return indexed_count
+    return indexed_count, project_path
 
 if __name__ == "__main__":
     num_indexed = ingest_and_index(".", "folder")
