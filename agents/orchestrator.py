@@ -8,7 +8,7 @@ class Orchestrator:
     def __init__(self, project_path: str = ".", provider: str = "openai", model_name: str = None):
         self.llm = LLMFactory.get_llm(provider, model_name)
         self.memory = InMemorySaver()
-        self.project_tools = ProjectTools(project_path)
+        self.project_tools = ProjectTools(project_path, llm=self.llm)
         self.tools = self.project_tools.get_tools()
         
         self.system_prompt = """
