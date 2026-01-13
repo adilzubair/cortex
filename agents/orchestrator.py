@@ -92,7 +92,8 @@ UNCLEAR: Ask ONE clarifying question.
             model=self.llm,
             tools=self.tools,
             system_prompt=self.system_prompt,
-            checkpointer=self.memory
+            checkpointer=self.memory,
+            debug=True
         )
 
     def ask(self, query: str, thread_id: str = "default"):
