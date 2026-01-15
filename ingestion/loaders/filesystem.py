@@ -5,9 +5,16 @@ from datetime import datetime
 CODE_EXTENSIONS = {
     ".py": "python",
     ".js": "javascript",
+    ".jsx": "javascript",
     ".ts": "typescript",
+    ".tsx": "typescript",
     ".java": "java",
     ".cpp": "cpp",
+    ".html": "html",
+    ".htm": "html",
+    ".css": "css",
+    ".json": "json",
+    ".vue": "vue",
 }
 
 TEXT_EXTENSIONS = {
