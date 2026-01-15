@@ -1,7 +1,9 @@
 import subprocess
 import os
+import shutil
 from pathlib import Path
 from .filesystem import load_folder
+from core.config import get_global_repos_dir
 
 def load_github_repo(repo_url: str) -> tuple[list, str]:
     """
@@ -17,8 +19,7 @@ def load_github_repo(repo_url: str) -> tuple[list, str]:
     repo_name = os.path.basename(repo_url.rstrip('/').replace('.git', ''))
     
     # Create persistent storage directory
-    cortex_home = Path.home() / ".cortex" / "repos"
-    cortex_home.mkdir(parents=True, exist_ok=True)
+    cortex_home = get_global_repos_dir()
     
     clone_path = cortex_home / repo_name
     
@@ -51,3 +52,31 @@ def load_github_repo(repo_url: str) -> tuple[list, str]:
         doc.metadata["repo_url"] = repo_url
     
     return docs, str(clone_path)
+
+def list_cloned_repos() -> list[str]:
+    """
+    List all repositories cloned in the global repos directory.
+    
+    Returns:
+        list: List of repository names (folder names)
+    """
+    repos_dir = get_global_repos_dir()
+    return [d.name for d in repos_dir.iterdir() if d.is_dir()]
+
+def delete_cloned_repo(repo_name: str) -> bool:
+    """
+    Delete a cloned repository from the global repos directory.
+    
+    Args:
+        repo_name: Name of the repository folder
+        
+    Returns:
+        bool: True if deleted, False if not found
+    """
+    repos_dir = get_global_repos_dir()
+    repo_path = repos_dir / repo_name
+    
+    if repo_path.exists() and repo_path.is_dir():
+        shutil.rmtree(repo_path)
+        return True
+    return False

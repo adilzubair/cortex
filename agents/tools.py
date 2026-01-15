@@ -180,8 +180,7 @@ class ProjectTools:
             return "\n".join(matches[:50])  # Limit to 50 matches
 
         # ============================================================
-        # WRITE TOOLS - COMMENTED OUT (Agent is read-only for now)
-        # Uncomment these when you want the agent to modify files
+        # WRITE TOOLS 
         # ============================================================
         
         # @tool("write_file", description="Write content to a file. Creates the file if it doesn't exist. Use for creating new files or modifying existing ones.")

@@ -5,6 +5,7 @@ from rich.table import Table
 from rich.markdown import Markdown
 from ingestion.pipeline import ingest_and_index
 from ingestion.watcher import start_watching, start_background_watcher
+from ingestion.loaders.github import list_cloned_repos, delete_cloned_repo
 from agents.orchestrator import Orchestrator
 import os
 from dotenv import load_dotenv
@@ -12,6 +13,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = typer.Typer(help="Cortex: Your Local AI-Powered Codebase Assistant")
+repo_app = typer.Typer(help="Manage cloned GitHub repositories")
+app.add_typer(repo_app, name="repo")
 console = Console()
 
 @app.command()
@@ -116,6 +119,41 @@ def chat(
     finally:
         watcher.stop()
         watcher.join()
+
+@repo_app.command("list")
+def repo_list():
+    """
+    List all cloned GitHub repositories.
+    """
+    repos = list_cloned_repos()
+    if not repos:
+        console.print("[yellow]No repositories cloned yet.[/yellow]")
+        return
+    
+    table = Table(title="Cloned Repositories")
+    table.add_column("Name", style="cyan")
+    
+    for repo in repos:
+        table.add_row(repo)
+    
+    console.print(table)
+
+@repo_app.command("delete")
+def repo_delete(
+    name: str = typer.Argument(..., help="Name of the repository to delete")
+):
+    """
+    Delete a cloned GitHub repository.
+    """
+    confirm = typer.confirm(f"Are you sure you want to delete the repository '{name}'?")
+    if not confirm:
+        console.print("[yellow]Aborted.[/yellow]")
+        return
+    
+    if delete_cloned_repo(name):
+        console.print(f"[bold green]Successfully deleted repository:[/bold green] {name}")
+    else:
+        console.print(f"[bold red]Error:[/bold red] Repository '{name}' not found.")
 
 if __name__ == "__main__":
     app()
