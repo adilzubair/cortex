@@ -1,0 +1,521 @@
+uv run python scripts/run_scenario_evaluation.py
+╭────────────────────────────────────────────── Cortex Scenario Evaluator ──────────────────────────────────────────────╮
+│ AI Code Assistant Scenario Evaluation                                                                                 │
+│ Project: /Users/muhamedadil/gitea/cortex                                                                              │
+│ Model: openai/gpt-4o-mini                                                                                             │
+│ Scenarios: 30                                                                                                         │
+│ Interval: 15s                                                                                                         │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+━━━ Scenario 1/30 ━━━
+
+═══ CASE_01: Greeting and basic interaction ═══
+Category: General Inquiries
+
+User Query: Hello! Can you help me understand this codebase?
+
+Agent Response:
+It seems that the structure of the codebase includes several directories such as Users, agents, core, embeddings,        
+indexing, ingestion, llm, scripts, and vectorstore, but they are empty. Additionally, there was an attempt to read the   
+README.md, pyproject.toml, and main.py files, which resulted in errors indicating that they do not exist.                
+
+To help you understand the codebase further, we can perform targeted searches for any Python files or other content you  
+would like to in...                                                                                                      
+
+═══ Manual Evaluation ═══
+Expected: Agent should respond politely, confirm availability to help, and ask for clarification on what the user needs
+Success Criteria: Responds with greeting, Confirms readiness to assist, Asks clarifying questions if needed
+
+Automated Evaluation:
+  Accuracy: 70.0/100 → Satisfactory
+  User Experience: 75.0/100 → Satisfactory
+  Language Understanding: 80.0/100 → Good
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 2/30 ━━━
+
+═══ CASE_02: Project overview and capabilities ═══
+Category: General Inquiries
+
+User Query: What is Cortex? What are its main features?
+
+Agent Response:
+Cortex seems to be an AI code assistant designed for exploring and working with codebases. Based on the extracted        
+information, here are the main features:                                                                                 
+
+ 1 Project Structure Management: Cortex can handle the organization and management of project directories, storing       
+   metadata within a dedicated .cortex directory.                                                                        
+ 2 Search Capabilities:                                                                                                  
+    • Search Code: It allows for searching relevant code snippets in the indexed codebase, making it useful for          
+      understanding how certain functi...                                                                                
+
+═══ Manual Evaluation ═══
+Expected: Agent should read README or search for project info, explaining that Cortex is an AI-powered local codebase 
+assistant with RAG, multi-project support, incremental indexing, and LSP integration
+Success Criteria: Uses appropriate tools (read_file for README, list_files, search_code), Identifies Cortex as an AI code
+assistant, Mentions key features like RAG, multi-project support, incremental indexing, References the .cortex directory 
+structure
+
+Automated Evaluation:
+  Accuracy: 70.0/100 → Satisfactory
+  Speed: 13.74s → Poor
+  Language Understanding: 75.0/100 → Satisfactory
+  Robustness: 75.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 3/30 ━━━
+
+═══ CASE_03: Find specific function or class ═══
+Category: Code Search & Navigation
+
+User Query: Where is the search_code function defined?
+
+Agent Response:
+The search_code function is defined in the agents/tools.py file at line 27. Here’s a summary of its definition:          
+
+ • File: agents/tools.py                                                                                                 
+ • Line Number: 27                                                                                                       
+ • Context: The function is annotated with a description indicating its purpose as a tool for semantic search of code    
+   snippets based on meaning and context.                                                                                
+
+═══ Manual Evaluation ═══
+Expected: Agent should use search_code or grep_code to locate the search_code function in agents/tools.py and provide 
+file path with line numbers
+Success Criteria: Uses search_code or grep_code appropriately, Returns correct file path (agents/tools.py), Provides line
+numbers and context about the function's purpose
+
+Automated Evaluation:
+  Accuracy: 90.0/100 → Excellent
+  Speed: 5.05s → Satisfactory
+  Robustness: 75.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 4/30 ━━━
+
+═══ CASE_04: Semantic code search ═══
+Category: Code Search & Navigation
+
+User Query: Show me code that handles file hashing and change detection
+
+Agent Response:
+Here is some example code that handles file hashing and change detection in a Python application. The relevant components
+are located in the indexing/state.py file and are part of a broader system for managing file states:                     
+
+                                                 File: indexing/state.py                                                 
+
+                                                                                                                         
+ import hashlib                                                                                                          
+ import sqlite3                                                                                                          
+ from datetime import datetime                                                                                           
+                                                                                                                         
+ class StateManager:                                                                                                     
+     def __init__(self, project_path: str = ".", db_path: str = None):                                                   
+         if db_path is None:                                                                                             
+             self.db_path = get_state_db_path(project_p...                                                               
+                                                                                                                         
+
+═══ Manual Evaluation ═══
+Expected: Agent should use semantic search to find StateManager class and file hashing logic in indexing/state.py, even 
+if exact terms don't match
+Success Criteria: Uses semantic search (search_code), Finds StateManager class or related hashing code, Shows code 
+snippets with context about SHA-256 hashing
+
+Automated Evaluation:
+  Accuracy: 90.0/100 → Excellent
+  Language Understanding: 85.0/100 → Good
+  Robustness: 80.0/100 → Good
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 5/30 ━━━
+
+═══ CASE_05: Fallback strategy when primary tool fails ═══
+Category: Code Search & Navigation
+
+User Query: Find the Orchestrator class
+
+Agent Response:
+The Orchestrator class is defined in the agents/orchestrator.py file. Here are the details of its definition:            
+
+                                              File: agents/orchestrator.py                                               
+
+                                                                                                                         
+ class Orchestrator:                                                                                                     
+     """                                                                                                                 
+     Deep Agent Orchestrator that coordinates specialized sub-agents.                                                    
+                                                                                                                         
+     Uses LangChain's deepagents library to implement a supervisor pattern                                               
+     where the main orchestrator delegates to specialized sub-agents for                                                 
+     different types of tasks.                                                                                           
+     """                                                                                                                 
+                                                                                                                         
+     def __init__(self, project_path: str = ".", ...                                                                     
+                                                                                                                         
+
+═══ Manual Evaluation ═══
+Expected: If search_code fails, agent should fallback to grep_code for exact match or list_files to explore agents/ 
+directory
+Success Criteria: Attempts primary tool first, Falls back to alternative tools if needed, Successfully locates 
+Orchestrator in agents/orchestrator.py, Explains the search strategy used
+
+Automated Evaluation:
+  Robustness: 70.0/100 → Satisfactory
+  User Experience: 75.0/100 → Satisfactory
+  Accuracy: 70.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 6/30 ━━━
+
+═══ CASE_06: Multiple tool invocation in single request ═══
+Category: Cross-Tool Inquiries
+
+User Query: What's the project structure and where is the main entry point?
+
+Agent Response:
+The project structure is as follows:                                                                                     
+
+ • README.md: Documentation file providing an overview of the project.                                                   
+ • Users/: A directory likely containing user-specific data or configurations.                                           
+ • agents/: Contains various agent implementations for processing tasks.                                                 
+ • core/: Likely contains core functionalities and logic for the application.                                            
+ • embeddings/: Presumably related to embedding models or functions.                                                     
+ • indexing/: Involves functionalities related to indexing data.                                                         
+ • **inges...                                                                                                            
+
+═══ Manual Evaluation ═══
+Expected: Agent should use list_files for structure AND search/grep for main.py or __main__ in parallel or sequence
+Success Criteria: Uses multiple tools (list_files, search_code/grep_code), Identifies main.py as the entry point, Shows 
+directory structure with agents/, ingestion/, core/, etc., Executes tools efficiently (parallel if possible)
+
+Automated Evaluation:
+  Speed: 7.86s → Poor
+  Accuracy: 80.0/100 → Good
+  User Experience: 75.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 7/30 ━━━
+
+═══ CASE_07: Search and explain workflow ═══
+Category: Cross-Tool Inquiries
+
+User Query: Find the tool definitions and explain how they work
+
+Agent Response:
+Here are the tool definitions found in the agents/tools.py file and their respective functionalities:                    
+
+                                                    Tool Definitions                                                     
+
+ 1 search_code                                                                                                           
+    • Description: Searches for relevant code snippets in the indexed codebase. Useful for answering questions about how 
+      things work or finding specific logic.                                                                             
+    • Functionality: It fetches results from a vector store, applies reranking using a language model if available, and  
+      formats the results for display.                                                                                   
+ 2 read_file                                                                                                             
+    • **Descriptio...                                                                                                    
+
+═══ Manual Evaluation ═══
+Expected: Agent should search for tool definitions in agents/tools.py, read the file, and explain the ProjectTools class 
+and individual tools
+Success Criteria: Searches for tool definitions, Finds ProjectTools class in agents/tools.py, Reads and shows tool 
+functions like search_code, read_file, grep_code, Explains how tools are used by the agent
+
+Automated Evaluation:
+  Accuracy: 90.0/100 → Excellent
+  Language Understanding: 85.0/100 → Good
+  User Experience: 80.0/100 → Good
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 8/30 ━━━
+
+═══ CASE_08: Complex analysis requiring multiple tools ═══
+Category: Cross-Tool Inquiries
+
+User Query: How does the ingestion pipeline work from file loading to indexing?
+
+Agent Response:
+The ingestion pipeline for handling file loading to indexing can be summarized based on the ingest_and_index function    
+found in the ingestion/pipeline.py file. Here’s how it works step-by-step:                                               
+
+                                                   Ingestion Workflow                                                    
+
+ 1 Ingest and Index Functionality:                                                                                       
+    • The function ingest_and_index(source: str, source_type: str) is responsible for ingesting files from a specified   
+      source (either a local folder or a GitHub repository) and then indexing them for retrieval.                        
+ 2 **Source Type Identifi...                                                                                             
+
+═══ Manual Evaluation ═══
+Expected: Agent should trace the ingestion flow using multiple searches and file reads, explaining the pipeline from 
+loaders to vector store
+Success Criteria: Uses multiple tools systematically, Finds ingestion/pipeline.py and related loaders, Traces the flow 
+from file loading to chunking to embedding to storage, Provides step-by-step breakdown with code references
+
+Automated Evaluation:
+  Accuracy: 85.0/100 → Good
+  Language Understanding: 80.0/100 → Good
+  Speed: 16.25s → Poor
+  User Experience: 75.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 9/30 ━━━
+
+═══ CASE_09: Simple code addition ═══
+Category: Code Modification
+
+User Query: Add a logging statement to the search_code function
+
+Agent Response:
+It seems that I am unable to access the agents/tools.py file or any related directories to find the search_code function 
+and add a logging statement.                                                                                             
+
+To proceed with adding a logging statement to the search_code function, you generally would do the following steps in the
+code if access were available:                                                                                           
+
+                                                  Example Code Changes                                                   
+
+ 1 Import the logging module at the beginning of the file, if it’s not already imported:                                 
+                                                                                                                         
+    import logging                                                                                                       
+                                                                                                                         
+ 2 Configure the logging in...                                                                                           
+
+═══ Manual Evaluation ═══
+Expected: Agent should locate search_code in agents/tools.py, read it, and add appropriate logging with correct syntax
+Success Criteria: Locates search_code function in agents/tools.py, Adds logging in appropriate location (e.g., before 
+query execution), Uses correct Python logging syntax, Preserves existing functionality
+
+Automated Evaluation:
+  Accuracy: 70.0/100 → Satisfactory
+  Robustness: 65.0/100 → Needs Improvement
+  User Experience: 70.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 10/30 ━━━
+
+═══ CASE_10: Refactoring request ═══
+Category: Code Modification
+
+User Query: Refactor the file hashing logic in StateManager into a separate helper function
+
+Agent Response:
+I am currently unable to access the indexing/state.py file or any other directory structures to refactor the file hashing
+logic in the StateManager class as requested.                                                                            
+
+                                        Steps to Refactor the File Hashing Logic                                         
+
+If access were available, the following steps outline how you would restructure the file hashing logic:                  
+
+ 1 Create a New Helper Function: You would record the hash calculation logic as a separate helper function called        
+   compute_file_hash.                                                                                                    
+ 2 Update the Existing Logic:...                                                                                         
+
+═══ Manual Evaluation ═══
+Expected: Agent should identify hashing code in StateManager, create new helper function, update references, and ensure 
+no breaking changes
+Success Criteria: Identifies file hashing logic in indexing/state.py, Creates well-structured helper function for SHA-256
+hashing, Updates all references in StateManager, Maintains backward compatibility, Follows code style conventions
+
+Automated Evaluation:
+  Accuracy: 75.0/100 → Satisfactory
+  Robustness: 70.0/100 → Satisfactory
+  User Experience: 70.0/100 → Satisfactory
+  Language Understanding: 75.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 11/30 ━━━
+
+═══ CASE_11: Multi-file modification ═══
+Category: Code Modification
+
+User Query: Add error handling to all vector store operations across the codebase
+Reranking failed: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization 
+org-fvaqrDKpZUSFqHmoqfr2nLYV on tokens per min (TPM): Limit 200000, Used 200000, Requested 879. Please try again in 
+263ms. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 
+'rate_limit_exceeded'}}. Using original order.
+
+Agent Response:
+It appears that I am currently unable to access the necessary code files (indexing/indexer.py and vectorstore/chroma.py) 
+to implement the requested error handling for vector store operations.                                                   
+
+                                          Proposed Steps to Add Error Handling                                           
+
+Here’s how you can add error handling to the vector store operations if access were available:                           
+
+ 1 In indexer.py:                                                                                                        
+    • Modify the index_chunks method to include a try-except block around the call to add_chunks:                        
+                                                                                                                         
+    def index_chunks(self, c...                                                                                          
+                                                                                                                         
+
+═══ Manual Evaluation ═══
+Expected: Agent should find all Chroma/vector store operations, add consistent error handling, and update multiple files
+Success Criteria: Identifies all vector store operations (in vectorstore/, agents/tools.py), Applies consistent 
+try-except error handling pattern, Updates multiple files correctly, Doesn't introduce bugs, Provides summary of changes
+
+Automated Evaluation:
+  Accuracy: 75.0/100 → Satisfactory
+  Robustness: 65.0/100 → Needs Improvement
+  Speed: 63.61s → Poor
+  User Experience: 68.0/100 → Needs Improvement
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 12/30 ━━━
+
+═══ CASE_12: Multi-turn conversation with context ═══
+Category: Context & Memory
+
+Multi-turn conversation (3 turns)
+
+Turn 1: Find the StateManager class
+The `StateManager` class is defined in the `indexing/state.py` file. Here are the details of its definition:
+
+### File: `indexing/state.py`
+
+```python
+class StateManager:
+    def __init__(self, project_path: str = ".", db_path: str = None):
+        if db_path is None:
+            self.db_path = get_...
+
+Turn 2: What methods does it have?
+The `StateManager` class has the following methods:
+
+1. **`__init__(self, project_path: str = ".", db_path: str = None)`**:
+   - **Purpose**: Initializes the `StateManager` instance.
+   - **Parameters**:
+     - `project_path`: The path to the project.
+     - `db_path`: The path to the database file ...
+
+Turn 3: Add a method to clear the cache
+It seems that I am currently unable to access the `indexing/state.py` file or any other relevant directories to implement
+the requested method for clearing the cache or logging changes.
+
+### Proposed Method to Clear Cache
+
+If access were available, you could implement a method in the `StateManager` ...
+
+═══ Manual Evaluation ═══
+Expected: Agent should maintain context across turns, remembering the StateManager location in indexing/state.py and its 
+structure
+Success Criteria: Remembers StateManager location from turn 1, Doesn't re-search in subsequent turns, Lists methods like 
+compute_hash, is_file_modified, etc., Correctly adds new method based on existing structure, Maintains conversation 
+context
+
+Automated Evaluation:
+  Memory & Context: 75.0/100 → Satisfactory
+  User Experience: 78.0/100 → Satisfactory
+  Speed: 143.29s → Poor
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 13/30 ━━━
+
+═══ CASE_13: Reference to previous operations ═══
+Category: Context & Memory
+
+Multi-turn conversation (2 turns)
+
+Turn 1: Show me the Orchestrator class
+
+Error: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o-mini in organization 
+org-fvaqrDKpZUSFqHmoqfr2nLYV on tokens per min (TPM): Limit 200000, Used 142794, Requested 59394. Please try again in 
+656ms. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 
+'rate_limit_exceeded'}}
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 14/30 ━━━
+
+═══ CASE_14: Long conversation with multiple topics ═══
+Category: Context & Memory
+
+Multi-turn conversation (3 turns)
+
+Turn 1: Find the vector store configuration
+### Vector Store Configuration
+
+The vector store configuration is primarily defined in the `VectorStoreManager` class located in the 
+`vectorstore/chroma.py` file. Here are the details of the class and its functionality:
+
+### File: `vectorstore/chroma.py`
+
+```python
+class VectorStoreManager:
+    def ...
+
+Turn 2: What tools are available in ProjectTools?
+The **VectorStoreManager** class is primarily responsible for handling the configuration and operations related to the 
+vector store in the project, especially those involving ChromaDB. Below are the details about this class and its 
+functionality based on the search results.
+
+### Vector Store Configu...
+
+Turn 3: Update the embedding model we discussed earlier to use a different dimension
+It seems that I am unable to access the necessary files related to the embedding model and tool definitions to make the 
+requested modifications for changing the embedding dimension.
+
+### Proposed Changes if Access Were Available
+
+If access were available, here’s how we could modify the `OllamaEmbedd...
+
+═══ Manual Evaluation ═══
+Expected: Agent should maintain context even after topic switches and correctly reference the vector store configuration 
+from turn 1
+Success Criteria: Maintains context across topic switches, Correctly identifies 'earlier discussion' refers to vector 
+store config, Applies change to correct location (core/config.py or vectorstore/), Doesn't confuse tools discussion with 
+vector store config
+
+Automated Evaluation:
+  Memory & Context: 80.0/100 → Good
+  Language Understanding: 75.0/100 → Satisfactory
+  User Experience: 75.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 15/30 ━━━
+
+═══ CASE_15: Architectural decision making ═══
+Category: Complex Reasoning
+
+User Query: Should I use ChromaDB or FAISS for the vector store? What does Cortex currently use and why?
+
+Agent Response:
+The vector store configuration is primarily defined within the VectorStoreManager class in the vectorstore/chroma.py     
+file. Here’s a detailed overview:                                                                                        
+
+                                               File: vectorstore/chroma.py                                               
+
+                                                                                                                         
+ class VectorStoreManager:                                                                                               
+     def __init__(self, project_path: str = ".", collection_name="cortex", persist_dir=None):                            
+         if persist_dir is None:                                                                                         
+             persist_dir = get_vector_persist_dir(project_path)                                                          
+                                                                                                                         
+         self.client = chromadb.PersistentClient(path=persist_dir)                                                       
+         se...                                                                                                           
+                                                                                                                         
+
+═══ Manual Evaluation ═══
+Expected: Agent should analyze existing vector store implementation, explain that Cortex uses ChromaDB, provide 
+pros/cons, and make recommendation based on codebase conventions
+Success Criteria: Searches for vector store implementation in vectorstore/ directory, Identifies ChromaDB is currently 
+used, Provides pros/cons of ChromaDB vs FAISS, Makes recommendation aligned with existing codebase, Explains reasoning 
+clearly
+
+Automated Evaluation:
+  Language Understanding: 70.0/100 → Satisfactory
+  Accuracy: 70.0/100 → Satisfactory
+  User Experience: 70.0/100 → Satisfactory
+
+⏳ Waiting 15s before next scenario...
+
+━━━ Scenario 16/30 ━━━

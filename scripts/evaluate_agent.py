@@ -40,7 +40,7 @@ TEST_CASES = [
     }
 ]
 
-def run_evaluation(project_path: str = ".", provider: str = "openai", model: str = "gpt-4o"):
+def run_evaluation(project_path: str = ".", provider: str = "openai", model: str = "gpt-4o-mini"):
     project_path = os.path.abspath(project_path)
     console.print(Panel(f"[bold blue]Starting Agent Evaluation[/bold blue]\n[bold]Project:[/bold] {project_path}\n[bold]Model:[/bold] {provider}/{model}", title="Cortex Evaluator"))
     

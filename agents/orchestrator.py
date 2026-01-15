@@ -73,7 +73,7 @@ class Orchestrator:
     different types of tasks.
     """
     
-    def __init__(self, project_path: str = ".", provider: str = "openai", model_name: str = "gpt-5-mini"):
+    def __init__(self, project_path: str = ".", provider: str = "openai", model_name: str = "gpt-4o-mini"):
         """
         Initialize the orchestrator with sub-agents.
         
