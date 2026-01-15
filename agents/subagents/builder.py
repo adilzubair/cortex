@@ -22,7 +22,7 @@ Don't explain - just write the code and report results.
 """
 
 
-def get_builder_config(builder_tools: list):
+def get_builder_config(builder_tools: list, provider: str = "openai"):
     """
     Returns the configuration dictionary for the builder sub-agent.
     

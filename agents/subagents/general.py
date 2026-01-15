@@ -20,7 +20,7 @@ After tool calls, provide a focused answer based on what you found.
 """
 
 
-def get_general_config(general_tools: list):
+def get_general_config(general_tools: list, provider: str = "openai"):
     """
     Returns the configuration dictionary for the general sub-agent.
     

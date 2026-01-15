@@ -23,7 +23,7 @@ class ProjectTools:
         )
 
     def get_tools(self):
-        @tool("search_code", description="Search for relevant code snippets in the indexed codebase. Useful for answering questions about how things work or finding specific logic.")
+        @tool("search_code", description="Semantic search for code snippets based on meaning/context. Best for concepts and understanding 'how things work'. For exact function/class names, use grep_code instead.")
         def search_code(query: str):
             # Fetch more results initially for reranking
             results = self.vectorstore.similarity_search(query, k=10)
@@ -41,12 +41,26 @@ class ProjectTools:
                 formatted.append(f"File: {doc.metadata.get('path')}\nContent:\n{doc.page_content}\n---")
             return "\n".join(formatted)
 
-        @tool("read_file", description="Read the full content of a file from the local filesystem. Use this when you need more context than the search results provide.")
+        @tool("read_file", description="Read the full content of a file. Handles various encodings automatically. Use this to get context from specific files.")
         def read_file(path: str):
             try:
                 # If path is relative, make it relative to project_path
                 full_path = path if os.path.isabs(path) else os.path.join(self.project_path, path)
-                with open(full_path, 'r') as f:
+                
+                if not os.path.exists(full_path):
+                    return f"Error: File '{path}' does not exist."
+
+                # Try common encodings
+                encodings = ["utf-8", "latin-1", "utf-16"]
+                for enc in encodings:
+                    try:
+                        with open(full_path, 'r', encoding=enc) as f:
+                            return f.read()
+                    except (UnicodeDecodeError, LookupError):
+                        continue
+                
+                # Fallback
+                with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
                     return f.read()
             except Exception as e:
                 return f"Error reading file {path}: {str(e)}"
@@ -93,26 +107,50 @@ class ProjectTools:
             unique_results = list(dict.fromkeys(results))[:15]
             return "Top Usages:\n" + "\n---\n".join(unique_results)
 
-        @tool("list_files", description="List all files in a given directory (recursive). Useful for seeing the project structure or finding where a specific file might be located.")
-        def list_files(directory: str = "."):
+        @tool("list_files", description="List files and directories in a given directory. Returns relative paths. Mark directories with a trailing slash (/). Set recursive=True for a deep search.")
+        def list_files(directory: str = ".", recursive: bool = False):
             """List files in the project, ignoring common artifacts."""
             # Resolve directory relative to project_path
             search_path = directory if os.path.isabs(directory) else os.path.join(self.project_path, directory)
             
-            files_list = []
-            ignore_list = [".git", "__pycache__", ".venv", ".cortex", ".gemini", ".pytest_cache"]
+            if not os.path.exists(search_path):
+                return f"Error: Directory '{directory}' does not exist."
             
-            for root, dirs, files in os.walk(search_path):
-                dirs[:] = [d for d in dirs if not (d.startswith(".") or d in ignore_list)]
-                
-                for file in files:
-                    if not (file.startswith(".") or file.endswith((".pyc", ".pyo", "-journal", ".tmp"))):
-                        rel_path = os.path.relpath(os.path.join(root, file), self.project_path)
-                        files_list.append(rel_path)
+            files_list = []
+            ignore_list = [".git", "__pycache__", ".venv", ".cortex", ".gemini", ".pytest_cache", "node_modules"]
+            
+            if recursive:
+                for root, dirs, files in os.walk(search_path):
+                    dirs[:] = [d for d in dirs if not (d.startswith(".") or d in ignore_list)]
+                    for d in dirs:
+                        rel_path = os.path.relpath(os.path.join(root, d), self.project_path)
+                        files_list.append(rel_path + "/")
+                    for file in files:
+                        if not (file.startswith(".") or file.endswith((".pyc", ".pyo", "-journal", ".tmp"))):
+                            rel_path = os.path.relpath(os.path.join(root, file), self.project_path)
+                            files_list.append(rel_path)
+            else:
+                try:
+                    items = os.listdir(search_path)
+                    for item in items:
+                        if item.startswith(".") or item in ignore_list:
+                            continue
+                        
+                        item_path = os.path.join(search_path, item)
+                        rel_path = os.path.relpath(item_path, self.project_path)
+                        
+                        if os.path.isdir(item_path):
+                            files_list.append(rel_path + "/")
+                        else:
+                            if not item.endswith((".pyc", ".pyo", "-journal", ".tmp")):
+                                files_list.append(rel_path)
+                except Exception as e:
+                    return f"Error listing directory: {e}"
             
             if not files_list:
-                return f"No files found in directory '{directory}' (or everything is ignored)."
-                
+                return f"No files found in '{directory}' (or everything is ignored)."
+            
+            files_list.sort()
             return "\n".join(files_list[:100])
 
         @tool("search_files_by_name", description="Find files matching a pattern (e.g., '*.py', 'test_*').")
@@ -149,7 +187,7 @@ class ProjectTools:
             except Exception as e:
                 return f"Error: {e}"
 
-        @tool("grep_code", description="Search for exact regex patterns in files. Use for finding specific strings, function calls, or patterns that semantic search might miss.")
+        @tool("grep_code", description="Exact pattern matching using regex. CRITICAL for finding specific function names, class names, variable names, or when search_code returns no results. Always use this as a fallback if semantic search fails.")
         def grep_code(pattern: str, file_pattern: str = "*.py"):
             """Search for regex pattern in files matching file_pattern."""
             matches = []
