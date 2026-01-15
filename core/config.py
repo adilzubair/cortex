@@ -1,4 +1,11 @@
 import os
+from pathlib import Path
+
+def get_global_repos_dir() -> Path:
+    """Returns the absolute path to the global directory where GitHub repos are cloned."""
+    repos_dir = Path.home() / ".cortex" / "repos"
+    repos_dir.mkdir(parents=True, exist_ok=True)
+    return repos_dir
 
 def get_project_metadata_dir(project_path: str) -> str:
     """Returns the absolute path to the .cortex directory within the project."""

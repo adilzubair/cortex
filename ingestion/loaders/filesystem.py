@@ -15,6 +15,23 @@ TEXT_EXTENSIONS = {
     ".txt": "text"
 }
 
+def read_file_robust(path: str) -> str:
+    """
+    Reads a file using multiple encodings as fallback.
+    """
+    encodings = ["utf-8", "latin-1", "utf-16", "utf-16le", "utf-16be"]
+    
+    for enc in encodings:
+        try:
+            with open(path, "r", encoding=enc) as f:
+                return f.read()
+        except (UnicodeDecodeError, LookupError):
+            continue
+            
+    # Final fallback: read with utf-8 and ignore errors
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        return f.read()
+
 def load_folder(path: str) -> list[IngestedDocument]:
     documents = []
 
@@ -34,8 +51,7 @@ def load_folder(path: str) -> list[IngestedDocument]:
                 continue
 
             try:
-                with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
-                    content = f.read()
+                content = read_file_robust(full_path)
 
                 doc_type = "code" if ext in CODE_EXTENSIONS else "text"
 

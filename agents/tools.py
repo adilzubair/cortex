@@ -5,6 +5,8 @@ from core.config import get_vector_persist_dir
 import os
 import ast
 import fnmatch
+import re
+import subprocess
 import jedi
 
 def get_embeddings():
@@ -147,5 +149,113 @@ class ProjectTools:
             except Exception as e:
                 return f"Error: {e}"
 
-        return [search_code, read_file, get_symbol_info, find_references, list_files, search_files_by_name, get_file_outline]
+        @tool("grep_code", description="Search for exact regex patterns in files. Use for finding specific strings, function calls, or patterns that semantic search might miss.")
+        def grep_code(pattern: str, file_pattern: str = "*.py"):
+            """Search for regex pattern in files matching file_pattern."""
+            matches = []
+            ignore = [".git", "__pycache__", ".venv", ".cortex", "node_modules"]
+            
+            try:
+                compiled_pattern = re.compile(pattern)
+            except re.error as e:
+                return f"Invalid regex pattern: {e}"
+            
+            for root, dirs, files in os.walk(self.project_path):
+                dirs[:] = [d for d in dirs if d not in ignore]
+                for file in files:
+                    if fnmatch.fnmatch(file, file_pattern):
+                        file_path = os.path.join(root, file)
+                        rel_path = os.path.relpath(file_path, self.project_path)
+                        try:
+                            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                                for line_num, line in enumerate(f, 1):
+                                    if compiled_pattern.search(line):
+                                        matches.append(f"{rel_path}:{line_num}: {line.strip()}")
+                        except Exception:
+                            continue
+            
+            if not matches:
+                return f"No matches found for pattern '{pattern}' in {file_pattern} files"
+            
+            return "\n".join(matches[:50])  # Limit to 50 matches
+
+        # ============================================================
+        # WRITE TOOLS 
+        # ============================================================
+        
+        # @tool("write_file", description="Write content to a file. Creates the file if it doesn't exist. Use for creating new files or modifying existing ones.")
+        # def write_file(path: str, content: str):
+        #     """Write content to a file, creating directories if needed."""
+        #     full_path = path if os.path.isabs(path) else os.path.join(self.project_path, path)
+        #     
+        #     # Safety check: don't write outside project
+        #     if not os.path.abspath(full_path).startswith(self.project_path):
+        #         return f"Error: Cannot write outside project directory"
+        #     
+        #     try:
+        #         # Create backup if file exists
+        #         if os.path.exists(full_path):
+        #             backup_path = full_path + ".bak"
+        #             with open(full_path, 'r') as f:
+        #                 with open(backup_path, 'w') as backup:
+        #                     backup.write(f.read())
+        #         
+        #         # Create directory if needed
+        #         os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        #         
+        #         with open(full_path, 'w') as f:
+        #             f.write(content)
+        #         
+        #         return f"Successfully wrote {len(content)} characters to {path}"
+        #     except Exception as e:
+        #         return f"Error writing file: {e}"
+
+        # @tool("run_command", description="Run a shell command in the project directory. Use for testing, building, or running scripts. Commands have a 30 second timeout.")
+        # def run_command(command: str):
+        #     """Run a shell command with timeout and safety checks."""
+        #     # Safety check: block dangerous commands
+        #     dangerous = ["rm -rf", "sudo", "mkfs", "dd if=", "> /dev/"]
+        #     for d in dangerous:
+        #         if d in command:
+        #             return f"Error: Command blocked for safety (contains '{d}')"
+        #     
+        #     try:
+        #         result = subprocess.run(
+        #             command,
+        #             shell=True,
+        #             cwd=self.project_path,
+        #             capture_output=True,
+        #             text=True,
+        #             timeout=30
+        #         )
+        #         
+        #         output = ""
+        #         if result.stdout:
+        #             output += f"STDOUT:\n{result.stdout}\n"
+        #         if result.stderr:
+        #             output += f"STDERR:\n{result.stderr}\n"
+        #         output += f"Exit code: {result.returncode}"
+        #         
+        #         return output if output else "Command completed with no output"
+        #     except subprocess.TimeoutExpired:
+        #         return "Error: Command timed out after 30 seconds"
+        #     except Exception as e:
+        #         return f"Error running command: {e}"
+
+        # Return only read-only exploration tools
+        exploration_tools = [search_code, read_file, get_symbol_info, find_references, 
+                            list_files, search_files_by_name, get_file_outline, grep_code]
+        
+        return exploration_tools  # Read-only tools only
+    
+    def get_exploration_tools(self):
+        """Get tools suitable for exploration tasks (all tools are exploration now)."""
+        return self.get_tools()
+    
+    def get_builder_tools(self):
+        """Get tools suitable for building/writing tasks. Currently returns read-only tools."""
+        # Builder tools disabled - agent is read-only
+        return self.get_tools()
+
+
 
