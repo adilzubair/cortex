@@ -88,7 +88,7 @@ def ask(
 def chat(
     project: str = typer.Option(".", "--project", "-p", help="Path to the project to chat with"),
     provider: str = typer.Option("openai", "--provider", help="LLM Provider: 'ollama' or 'openai'"),
-    model: str = typer.Option("gpt-4o", "--model", "-m", help="Specific model name")
+    model: str = typer.Option("gpt-5-mini", "--model", "-m", help="Specific model name")
 ):
     """
     Start an interactive chat session with your codebase.

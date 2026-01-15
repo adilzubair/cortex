@@ -18,7 +18,7 @@ Don't explain planning - just create the plan using write_todos.
 """
 
 
-def get_planner_config():
+def get_planner_config(provider: str = "openai"):
     """
     Returns the configuration dictionary for the planner sub-agent.
     Uses the built-in write_todos tool from deepagents.
