@@ -37,8 +37,8 @@ def index_file(abs_path: str, source_root: str, indexer: Indexer = None, state_m
         
         # Minimally load document for this file
         try:
-            with open(abs_path, "r", encoding="utf-8") as f:
-                content = f.read()
+            from ingestion.loaders.filesystem import read_file_robust
+            content = read_file_robust(abs_path)
         except Exception as e:
             print(f"Error reading {abs_path}: {e}")
             return False
