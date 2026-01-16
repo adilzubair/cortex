@@ -9,7 +9,8 @@ class LLMFactory:
         if provider == "openai":
             return ChatOpenAI(
                 model=model_name or "gpt-4o",
-                api_key=os.getenv("OPENAI_API_KEY")
+                api_key=os.getenv("OPENAI_API_KEY"),
+                temperature=0  # Critical for consistent tool calling
             )
         elif provider == "ollama":
             return ChatOllama(

@@ -93,12 +93,20 @@ class ProjectTools:
             results = []
             for name in names:
                 if name.is_definition():
-                    refs = name.references()
-                    for ref in refs:
+                    try:
+                        refs = name.references()
+                        for ref in refs:
+                            results.append(
+                                f"File: {ref.module_path}\n"
+                                f"Line: {ref.line}, Column: {ref.column}\n"
+                                f"Context: {ref.description}\n"
+                            )
+                    except AttributeError:
+                        # Some Name objects don't support references()
                         results.append(
-                            f"File: {ref.module_path}\n"
-                            f"Line: {ref.line}, Column: {ref.column}\n"
-                            f"Context: {ref.description}\n"
+                            f"File: {name.module_path}\n"
+                            f"Line: {name.line}, Column: {name.column}\n"
+                            f"Definition: {name.full_name} ({name.type})\n"
                         )
             
             if not results:
