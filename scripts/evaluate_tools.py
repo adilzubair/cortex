@@ -49,7 +49,7 @@ TOOL_TEST_CASES = [
     }
 ]
 
-def run_tool_evaluation(project_path: str = ".", provider: str = "openai", model: str = "gpt-4o", interval: int = 15):
+def run_tool_evaluation(project_path: str = ".", provider: str = "openai", model: str = "gpt-4o-mini", interval: int = 15):
     project_path = os.path.abspath(project_path)
     console.print(Panel(f"[bold blue]Starting Tool Performance Evaluation[/bold blue]\n[bold]Project:[/bold] {project_path}\n[bold]Model:[/bold] {provider}/{model}\n[bold]Wait Interval:[/bold] {interval}s", title="Cortex Tool Evaluator"))
     
