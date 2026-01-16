@@ -26,7 +26,7 @@ def main():
     evaluator = ScenarioEvaluator(
         project_path=".",
         provider="openai",
-        model="gpt-4o-mini",
+        model="gpt-5-mini",
         interval=0  # No wait for single scenario
     )
     

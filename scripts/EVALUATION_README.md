@@ -97,11 +97,11 @@ The script uses a **separate LLM call** to evaluate each metric:
 
 | Duration | Rating |
 |----------|--------|
-| <4s | Excellent |
-| 4-5s | Good |
-| 5-6s | Satisfactory |
-| 6-7s | Needs Improvement |
-| >7s | Poor |
+| <5s | Excellent |
+| 5-8s | Good |
+| 8-10s | Satisfactory |
+| 10-12s | Needs Improvement |
+| >12s | Poor |
 
 ## 📝 Scenario Categories
 
