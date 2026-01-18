@@ -1,6 +1,55 @@
 import os
 from pathlib import Path
 
+# --- File System Constants ---
+
+CODE_EXTENSIONS = {
+    ".py": "python",
+    ".js": "javascript",
+    ".jsx": "javascript",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".java": "java",
+    ".cpp": "cpp",
+    ".html": "html",
+    ".htm": "html",
+    ".css": "css",
+    ".json": "json",
+    ".vue": "vue",
+}
+
+TEXT_EXTENSIONS = {
+    ".md": "markdown",
+    ".txt": "text"
+}
+
+IGNORED_DIRS = {
+    ".git",
+    "__pycache__",
+    ".venv",
+    ".pytest_cache",
+    ".cortex",
+    ".gemini",
+    ".idea",
+    ".vscode",
+    "node_modules",
+}
+
+IGNORED_FILE_SUFFIXES = (
+    "-journal",
+    ".tmp",
+    ".swp",
+    ".DS_Store"
+)
+
+# --- Model Constants ---
+
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "qwen3-embedding:0.6b")
+OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "600"))
+
+# --- Path Constants ---
+
 def get_global_repos_dir() -> Path:
     """Returns the absolute path to the global directory where GitHub repos are cloned."""
     repos_dir = Path.home() / ".cortex" / "repos"

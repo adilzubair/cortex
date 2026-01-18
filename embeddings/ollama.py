@@ -1,12 +1,13 @@
 from typing import List
 import time
+from core.config import OLLAMA_BASE_URL, OLLAMA_TIMEOUT
 
 class OllamaEmbeddingModel:
     def __init__(
         self,
         model: str,
-        base_url: str = "http://localhost:11434",
-        timeout: int = 600,  # 10 minutes
+        base_url: str = OLLAMA_BASE_URL,
+        timeout: int = OLLAMA_TIMEOUT,
         batch_size: int = 32,
     ):
         self.model = model

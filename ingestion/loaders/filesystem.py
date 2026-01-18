@@ -2,25 +2,7 @@ import os
 from .base import IngestedDocument
 from datetime import datetime
 
-CODE_EXTENSIONS = {
-    ".py": "python",
-    ".js": "javascript",
-    ".jsx": "javascript",
-    ".ts": "typescript",
-    ".tsx": "typescript",
-    ".java": "java",
-    ".cpp": "cpp",
-    ".html": "html",
-    ".htm": "html",
-    ".css": "css",
-    ".json": "json",
-    ".vue": "vue",
-}
-
-TEXT_EXTENSIONS = {
-    ".md": "markdown",
-    ".txt": "text"
-}
+from core.config import CODE_EXTENSIONS, TEXT_EXTENSIONS, IGNORED_DIRS
 
 def read_file_robust(path: str) -> str:
     """
@@ -43,15 +25,15 @@ def load_folder(path: str) -> list[IngestedDocument]:
     documents = []
 
     for root, dirs, files in os.walk(path):
-        # Skip hidden directories in-place (dirs starting with .)
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        # Skip ignored directories in-place
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in IGNORED_DIRS]
         
         for file in files:
             # Skip hidden files
             if file.startswith('.'):
                 continue
                 
-            ext = os.path.splitext(file)[1]
+            ext = os.path.splitext(file)[1].lower()
             full_path = os.path.join(root, file)
 
             if ext not in CODE_EXTENSIONS and ext not in TEXT_EXTENSIONS:
@@ -68,7 +50,7 @@ def load_folder(path: str) -> list[IngestedDocument]:
                         metadata={
                             "source": "filesystem",
                             "path": os.path.relpath(full_path, path),
-                            "abs_path": os.path.abspath(full_path), # Add this line
+                            "abs_path": os.path.abspath(full_path),
                             "type": doc_type,
                             "language": CODE_EXTENSIONS.get(ext, "unknown"),
                             "last_modified": datetime.fromtimestamp(
