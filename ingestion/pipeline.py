@@ -15,13 +15,15 @@ def index_file(abs_path: str, source_root: str, indexer: Indexer = None, state_m
     # Determine relative path for metadata
     rel_path = os.path.relpath(abs_path, source_root)
     
-    # Check if we should ignore (e.g. .git, __pycache__, .venv, .cortex)
-    ignore_list = [".git", "__pycache__", ".venv", ".pytest_cache", ".cortex", ".gemini"]
-    if any(part.startswith(".") or part in ignore_list for part in rel_path.split(os.sep)):
+    # Check if we should ignore
+    from core.config import IGNORED_DIRS, IGNORED_FILE_SUFFIXES, CODE_EXTENSIONS
+    
+    parts = rel_path.split(os.sep)
+    if any(part.startswith(".") or part in IGNORED_DIRS for part in parts):
         return False
 
     # Also ignore typical temporary/journal files
-    if rel_path.endswith(("-journal", ".tmp", ".swp")):
+    if rel_path.endswith(IGNORED_FILE_SUFFIXES):
         return False
 
     if not os.path.exists(abs_path):
@@ -31,7 +33,6 @@ def index_file(abs_path: str, source_root: str, indexer: Indexer = None, state_m
     
     if has_changed:
         print(f"Indexing: {rel_path}")
-        from ingestion.loaders.filesystem import CODE_EXTENSIONS
         ext = os.path.splitext(abs_path)[1].lower()
         doc_type = "code" if ext in CODE_EXTENSIONS else "text"
         

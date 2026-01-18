@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from core.config import EMBEDDING_MODEL, OLLAMA_BASE_URL
+
 class Indexer:
     def __init__(self, project_path: str = ".", embedding_model=None, vector_store=None):
         self.embedding_model = embedding_model or OllamaEmbeddingModel(
-            model="qwen3-embedding:0.6b",
-            base_url= "http://localhost:11434" 
+            model=EMBEDDING_MODEL,
+            base_url=OLLAMA_BASE_URL 
         )
         self.vector_store = vector_store or VectorStoreManager(project_path=project_path)
 
